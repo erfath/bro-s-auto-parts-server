@@ -54,9 +54,15 @@ async function run() {
             res.send(items);
         })
 
-        app.post('/item', async (req, res)=>{
+        app.post('/item', verifyJWT, verifyAdmin, async (req, res)=>{
             const newItem = req.body;
             const result = await itemCollection.insertOne(newItem);
+            res.send(result);
+        })
+        app.delete('/item/:id', verifyJWT, verifyAdmin, async (req, res)=>{
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)};            
+            const result = await itemCollection.deleteOne(filter);
             res.send(result);
         })
 
@@ -81,20 +87,12 @@ async function run() {
 
         app.put('/user/admin/:email', verifyJWT, verifyAdmin, async (req, res) => {
             const email = req.params.email;
-            const requester = req.decoded.email;
-            const requesterAccount = await userCollection.findOne({ email: requester });
-            if (requesterAccount.role === 'admin') {
                 const filter = { email: email };
                 const updateDoc = {
                     $set: { role: 'admin' },
                 };
                 const result = await userCollection.updateOne(filter, updateDoc);
                 res.send(result);
-            }
-            else {
-                res.status(403).send({ message: 'Forbiden Access' })
-            }
-
         })
 
         app.put('/user/:email', async (req, res) => {
