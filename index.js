@@ -18,6 +18,7 @@ async function run() {
         await client.connect();
         const itemCollection = client.db('auto-parts').collection('items');
         const orderCollection = client.db('auto-parts').collection('orders');
+        const userCollection = client.db('auto-parts').collection('users');
 
         app.get('/item', async (req, res)=>{
             const query = {}
@@ -32,6 +33,18 @@ async function run() {
             const item = await itemCollection.findOne(query)
             res.send(item);
         });
+        app.put('/user/:email', async (req,  res)=>{
+            const email = req.params.email;
+            const user = req.body;            
+            const filter = {email: email};
+            const options = {upsert : true};
+            const updateDoc = {
+                $set : user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+
+        })
 
         app.post('/order', async (req, res)=>{
             const order = req.body;
