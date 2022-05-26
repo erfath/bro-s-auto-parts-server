@@ -37,6 +37,7 @@ async function run() {
         const orderCollection = client.db('auto-parts').collection('orders');
         const userCollection = client.db('auto-parts').collection('users');
         const paymentsCollection = client.db('auto-parts').collection('payments');
+        const userInfoCollection = client.db('auto-parts').collection('userInfo');
 
         const verifyAdmin = async (req, res, next) => {
             const requester = req.decoded.email;
@@ -51,7 +52,6 @@ async function run() {
 
         app.post("/create-payment-intent", verifyJWT, async (req, res) => {
             const item = req.body;
-            console.log(item)
             const price = item.totalPrice;           
             const amount = price * 100;
             const paymentIntent = await stripe.paymentIntents.create({
@@ -107,6 +107,13 @@ async function run() {
             const users = await userCollection.find().toArray();
             res.send(users);
         });
+
+        app.delete('/user/:email', verifyJWT, verifyAdmin, async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const result = await userCollection.deleteOne(filter);
+            res.send(result);
+        })
 
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
@@ -180,6 +187,17 @@ async function run() {
             res.send(updateDoc);
           })
 
+          app.get('/orders', verifyJWT, async (req, res) => {
+            const orders = await orderCollection.find().toArray();
+            res.send(orders);
+        });
+
+          app.post('/userInfo', verifyJWT, async (req, res)=>{
+              const userInfo = req.body;
+              console.log(userInfo)
+              const result = await userInfoCollection.insertOne(userInfo);
+              res.send(result);
+          })
 
 
     }
