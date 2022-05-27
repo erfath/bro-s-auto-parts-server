@@ -38,6 +38,7 @@ async function run() {
         const userCollection = client.db('auto-parts').collection('users');
         const paymentsCollection = client.db('auto-parts').collection('payments');
         const userInfoCollection = client.db('auto-parts').collection('userInfo');
+        const commentsCollection = client.db('auto-parts').collection('comments');
 
         const verifyAdmin = async (req, res, next) => {
             const requester = req.decoded.email;
@@ -172,6 +173,14 @@ async function run() {
             res.send(order)
         })
 
+        app.delete('/order/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            console.log(id)
+            const filter = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(filter);
+            res.send(result);
+        })
+
         app.patch('/order/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const payment = req.body;
@@ -198,7 +207,12 @@ async function run() {
               const result = await userInfoCollection.insertOne(userInfo);
               res.send(result);
           })
-
+          app.post('/comments', verifyJWT, async (req, res)=>{
+              const comments = req.body;
+              const result = await commentsCollection.insertOne(comments);
+              res.send(result);
+          })
+        
 
     }
 
