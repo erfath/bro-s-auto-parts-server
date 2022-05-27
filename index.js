@@ -39,6 +39,7 @@ async function run() {
         const paymentsCollection = client.db('auto-parts').collection('payments');
         const userInfoCollection = client.db('auto-parts').collection('userInfo');
         const commentsCollection = client.db('auto-parts').collection('comments');
+        const reviewCollection = client.db('auto-parts').collection('review');
 
         const verifyAdmin = async (req, res, next) => {
             const requester = req.decoded.email;
@@ -210,6 +211,11 @@ async function run() {
           app.post('/comments', verifyJWT, async (req, res)=>{
               const comments = req.body;
               const result = await commentsCollection.insertOne(comments);
+              res.send(result);
+          })
+          app.post('/review', verifyJWT, async (req, res)=>{
+              const review = req.body;
+              const result = await reviewCollection.insertOne(review);
               res.send(result);
           })
         
