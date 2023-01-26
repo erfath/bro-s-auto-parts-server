@@ -33,6 +33,7 @@ const verifyJWT = (req, res, next) => {
 async function run() {
     try {
         await client.connect();
+        console.log("DB Connected")
         const itemCollection = client.db('auto-parts').collection('items');
         const orderCollection = client.db('auto-parts').collection('orders');
         const userCollection = client.db('auto-parts').collection('users');
